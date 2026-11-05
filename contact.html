@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>聯絡我們 - 我的公司</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>聯絡我們</h1>
+        <nav>
+            <a href="index.html">首頁</a>
+            <a href="about.html">公司介紹</a>
+            <a href="contact.html">聯絡我們</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h2>填寫表單與我們聯絡</h2>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">姓名：</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">電話：</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="email">EMAIL：</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="message">聯絡內容：</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" id="submitBtn">送出表單</button>
+        </form>
+        <p id="statusMsg" style="margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        // 已帶入你專屬的 Google Apps Script 部署網址
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwd0o6W173gK_yTmV5ZBIp9k9J7KLGE6L_jRf5yqcOPZ29rTgYch7GyjkIwufQPnXPRnA/exec';
+        
+        const form = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = '傳送中...';
+            statusMsg.textContent = '';
+
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+
+            // 使用 fetch 將資料送往 Google Apps Script
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // 避免 GAS 跨域阻擋
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(() => {
+                statusMsg.style.color = 'green';
+                statusMsg.textContent = '表單已成功送出！請檢查您的信箱是否收到通知。';
+                form.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = '送出表單';
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                statusMsg.style.color = 'red';
+                statusMsg.textContent = '送出失敗，請稍後再試。';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '送出表單';
+            });
+        });
+    </script>
+</body>
+</html>
